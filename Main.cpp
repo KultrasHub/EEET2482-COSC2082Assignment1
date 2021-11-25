@@ -448,8 +448,8 @@ int main()
     //4-Mean Absolute Deviation----------------------------------
     cout << "4-Mean Absolute Deviation" << endl;
     //display
-    cout << "var_x= " << MeanAbsoluteDeviation(xArray, arraySize) << " - "
-         << "var_y= " << MeanAbsoluteDeviation(yArray, arraySize) << endl;
+    cout << "mad_x= " << MeanAbsoluteDeviation(xArray, arraySize) << " - "
+         << "mad_y= " << MeanAbsoluteDeviation(yArray, arraySize) << endl;
     //conclusion
     cout << "--" << endl;
     //5-Third quartile-------------------------------------------
