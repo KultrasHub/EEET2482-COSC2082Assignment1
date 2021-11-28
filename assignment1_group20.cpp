@@ -7,44 +7,92 @@ using namespace std;
 class double2{
     double *xArr;
     double *yArr;
-    int size;
+    int sizeX;
+    int sizeY;
     //constructor
     public:
-        double2(double *xArr,double *yArr,int size)
+        double2(double *xArr,double *yArr,int sizeX,int sizeY)
         {
             this->xArr=xArr;
             this->yArr=yArr;
-            this->size=size;
+            this->sizeX=sizeX;
+            this->sizeY=sizeY;
         }
         ~double2()
         {
-            cout<<"double has been deleted"<<endl;
+            //cout<<"double has been deleted"<<endl;
             delete[] xArr;
             delete[] yArr;
         }
         double* GetXArray()
         {
-            cout<<"x: ";
-            for(int i=0;i<size;i++)
-            {
-                cout<<","<<xArr[i];
-            }
             return xArr;
         }
         double* GetYArray()
         {
-            cout<<"y: ";
-            for(int i=0;i<size;i++)
-            {
-                cout<<","<<yArr[i];
-            }
             return yArr;
         }
-        int Size()
+        int SizeX()
         {
-            return size;
+            return sizeX;
+        }
+        int SizeY()
+        {
+            return sizeY;
         }
 };
+
+//check if a string can ber converted to a number
+bool IsNumber(string str) 
+{
+    int dot = 1;//allow one dot
+    int polarity = 1;
+
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (!isdigit(str[i]))
+        {
+            if (str[i] == ' ')
+            {
+                continue;
+            }
+            else if (str[i] == '.' && dot == 1)
+            {
+                dot--;
+                polarity--;
+                continue;
+            }
+            else if (str[i] == '+' && polarity == 1 || str[i] == '-' && polarity == 1)
+            {
+                polarity--;
+                continue;
+            }
+            else
+            {         
+                if(str[i]=='\r'&&i == (str.length() -1))//in csv file line contain \r at the end 
+                {
+                    //cout<<"special key found";
+                    return true;
+                }  
+                return false;
+            }
+        }
+        else
+        {
+            if (i == (str.length() -1))//last key 
+            {
+                return true;
+                break;
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
+    
+    return false;
+}
 //static value use in testing
 //change to exact location if the name below does match
 //string fileName ="data1.csv";
@@ -70,22 +118,40 @@ double2* ReadCSVFile(string fileLocation)
     //int
     int x = 0;
     int y = 0;
-    int count = 0;
+    int countX = 0;
+    int countY=0;
     //ignore the value first line
     getline(infile, line);
     getline(infile2, line);
     //
     cout << "Reading CSV FILE" << endl;
-    //get amount of line
-    while (getline(infile, line))
+    //get amount of nummber
+    while (getline(infile, line,'\n'))
     {
-        count++;
+        //split line by comma
+        int cPos = line.find(",");           //position of comma
+        const string first = line.substr(0, cPos); //first to comma
+        const string second = line.substr(cPos+delimiterLength,line.find("\n")); //line.erase(0, cPos + delimiterLength);
+        //cout<<"second length is:"<<second.length()-1<<endl;
+        //cout<<first<<" num?: "<<IsNumber(first)<<" -"<<second<<"num?:"<<IsNumber(second)<<endl;
+        if(IsNumber(first))
+        {
+            //cout<<"first checked"<<first<<endl;
+            countX++;
+        }
+        cout<<"on second check: "<<second<<endl;
+        //cout<<IsNumber(second)<<endl;
+        if(IsNumber(second))
+        {
+            cout<<"is a number"<<endl;
+            countY++;
+        }
     }
-    cout<<"counting complete: "<<count<<endl;
     //Init array
-    xArray=new double[count];
-    yArray=new double[count];
-    int runningValue=0;
+    xArray=new double[countX];
+    yArray=new double[countY];
+    int runningValueX=0;
+    int runningValueY=0;
     cout<<"Initualize array complete"<<endl;
     //get data
     while (getline(infile2, line))
@@ -95,67 +161,30 @@ double2* ReadCSVFile(string fileLocation)
         string first = line.substr(0, cPos); //first to comma
         string second = line.erase(0, cPos + delimiterLength);
         //convert to int
-        x = stoi(first);
-        y = stoi(second);
-        xArray[runningValue]=x;
-        yArray[runningValue]=y;
-        runningValue++;
+        if(IsNumber(first))
+        {
+            x = stoi(first);
+            xArray[runningValueX]=x;
+            runningValueX++;
+        }
+        if(IsNumber(second))
+        {
+            y = stoi(second);
+            yArray[runningValueY]=y;
+            runningValueY++;
+        }
         //cout<<"value add in: "<<x<<" and "<<y<<endl;
     }
     cout << endl
          << "Reading Complete" << endl;
-    double2* temp=new double2(xArray,yArray,count);
+    cout<<"x:"<<countX<<"y: "<<countY<<endl;
+    double2* temp=new double2(xArray,yArray,countX,countY);
     //close file
     infile.close();
     infile2.close();
     return temp;
 }
 //Common Function--------------------------------------------------------------
-//check if a string is a number
-void check_number(string str) 
-{
-    int dot = 1;
-    int polarity = 1;
-
-
-    for (int i = 0; i < str.length(); i++)
-    {
-        if (isdigit(str[i]) == false)
-        {
-            if (str[i] == ' ')
-            {
-                continue;
-            }
-            else if (str[i] == '.' && dot == 1)
-            {
-                dot--;
-                polarity--;
-                continue;
-            }
-            else if (str[i] == '+' && polarity == 1 || str[i] == '-' && polarity == 1)
-            {
-                polarity--;
-                continue;
-            }
-            else
-            {            
-                cout << str << " is a string" << endl;
-                break;
-            }
-        }
-        else
-        {
-            if (i == (str.length() -1))
-            {
-                cout << str << " is an number" << endl;
-            }
-            else
-            {
-                continue;
-            }
-        }
-    }
-}
 //display
 void Display(double *arr, int size)
 {
@@ -490,6 +519,7 @@ int main(int argc, char* argv[])
     //string fileName = "data1.csv";
     //Get values from reader
     double2 *arrayContent = ReadCSVFile(string(argv[1]));
+    //double2 *arrayContent = ReadCSVFile("data1.csv");
     //while Testing use GetATestingList to check for the result
     // double xArr[]={1,2,3,62,31,51,23};
     // double yArr[]={83,23,12,43,82,12,2};
@@ -497,18 +527,19 @@ int main(int argc, char* argv[])
     // double2* temp=new double2(xArr,yArr,size);
     // double2* arrayContent=temp;
     //convert list to 2 array
-    int arraySize = arrayContent->Size();
+    int arraySizeX = arrayContent->SizeX();
+    int arraySizeY=arrayContent->SizeY();
     double* xArray=arrayContent->GetXArray();
     double* yArray=arrayContent->GetYArray();
     //initing
     cout<<"Initualize dynamic array"<<endl;
-    cout<<"array size:"<<arraySize<<endl;
+    cout<<"array size:"<<arraySizeX<<" and  "<<arraySizeY<<endl;
     // Display(xArray,arraySize);
     // Display(yArray,arraySize);
     //sorting
     cout << "Sorting Start! Please Wait" << endl;
-    quickSort(xArray, 0, arraySize - 1,arraySize);
-    quickSort(yArray, 0, arraySize - 1,arraySize);
+    quickSort(xArray, 0, arraySizeX - 1,arraySizeX);
+    quickSort(yArray, 0, arraySizeY - 1,arraySizeY);
     cout << "Sorting Completed successfully" << endl;
     cout<<setprecision(4)<<endl;
     cout<<fixed;
@@ -521,22 +552,22 @@ int main(int argc, char* argv[])
     //1-Median
     cout << "1-Median" << endl;
     //display
-    cout << "median_x= " << Median(xArray, arraySize) << " - "
-         << "median_y= " << Median(yArray, arraySize) << endl;
+    cout << "median_x= " << Median(xArray, arraySizeX) << " - "
+         << "median_y= " << Median(yArray, arraySizeY) << endl;
     //conclusion
     cout << "--" << endl;
     //2-Mode
     cout << "2-Mode" << endl;
     //display
-    cout << "mode_x= " << Mode(xArray, arraySize) << " - "
-         << "mode_y= " << Mode(yArray, arraySize) << endl;
+    cout << "mode_x= " << Mode(xArray, arraySizeX) << " - "
+         << "mode_y= " << Mode(yArray, arraySizeY) << endl;
     //conclusion
     cout << "--" << endl;
     //3-Variance-------------------------------------------
     cout << "3-Variance and standard deviation" << endl;
     // variable
-    double varX = Variance(xArray, arraySize);
-    double varY = Variance(yArray, arraySize);
+    double varX = Variance(xArray, arraySizeX);
+    double varY = Variance(yArray, arraySizeY);
     //standard deviation-- use below
     double sX = sqrt(varX);
     double sY = sqrt(varY);
@@ -550,41 +581,49 @@ int main(int argc, char* argv[])
     //4-Mean Absolute Deviation----------------------------------
     cout << "4-Mean Absolute Deviation" << endl;
     //display
-    cout << "mad_x= " << MeanAbsoluteDeviation(xArray, arraySize) << " - "
-         << "mad_y= " << MeanAbsoluteDeviation(yArray, arraySize) << endl;
+    cout << "mad_x= " << MeanAbsoluteDeviation(xArray, arraySizeX) << " - "
+         << "mad_y= " << MeanAbsoluteDeviation(yArray, arraySizeY) << endl;
     //conclusion
     cout << "--" << endl;
     //5-Third quartile-------------------------------------------
     cout << "5-Thrid Quartile" << endl;
     //display
-    cout<<"Q3_x= "<<quartile3(xArray,arraySize)<< " - "<<"Q3_y= "<<quartile3(yArray,arraySize)<<endl;
+    cout<<"Q3_x= "<<quartile3(xArray,arraySizeX)<< " - "<<"Q3_y= "<<quartile3(yArray,arraySizeY)<<endl;
     //conclusion
     cout << "--" << endl;
     //6-Skewness------------------------------------------------
     cout << "6-Skewness" << endl;
     //display
-    cout << "skew_x= " << Skewness(xArray, arraySize, sX) << " - "
-         << "skew_y= " << Skewness(yArray, arraySize, sY) << endl;
+    cout << "skew_x= " << Skewness(xArray, arraySizeX, sX) << " - "
+         << "skew_y= " << Skewness(yArray, arraySizeY, sY) << endl;
     //conclusion
     cout << "--" << endl;
     //7-Kurtosis------------------------------------------------
     cout << "7-Kurtosis" << endl;
     //display
-    cout << "kurt_x= " << Kurtosis(xArray, arraySize, sX) << " - "
-         << "kurt_y= " << Kurtosis(yArray, arraySize, sY) << endl;
+    cout << "kurt_x= " << Kurtosis(xArray, arraySizeX, sX) << " - "
+         << "kurt_y= " << Kurtosis(yArray, arraySizeY, sY) << endl;
     //conclusion
     cout << "--" << endl;
+    if(arraySizeX!=arraySizeY)
+    {
+        cout<<"we can not compute Inferential Statics if there are different amount of number of X and Y"<<endl;
+        cout<<"There are: "<<arraySizeX<<" numbers in X column"<<" while there are "<<arraySizeY<<" numbers in Y column"<<endl;
+        cout<<"Tt is necessary to have the both amount equal"<<endl;
+        cout<<"--"<<endl;
+    }
+    else{
     cout << "Inferential Statics" << endl;
     //1-Covariance------------------------------------------------
     cout << "1-Covariance" << endl;
     //display
-    cout << "cov(x_y)= " << Covariance(xArray, yArray, arraySize) << endl;
+    cout << "cov(x_y)= " << Covariance(xArray, yArray, arraySizeX) << endl;
     //conclusion
     cout << "--" << endl;
     //2-Pearson correlation coefficient------------------------------------------------
     cout << "2-Pearson correlation coefficient" << endl;
     //display
-    double r=CorrelationCoefficient(xArray, yArray, arraySize);
+    double r=CorrelationCoefficient(xArray, yArray, arraySizeX);
     cout << "r(x_y)= " << r<< endl;
     //conclusion
     cout << "--" << endl;
@@ -592,14 +631,17 @@ int main(int argc, char* argv[])
     cout << "3-LinearRegression" << endl;
     double a = slope(r, sX, sY);
     //Intercept (b)
-    double b = GetMean(xArray, arraySize) - a * GetMean(yArray, arraySize);
+    double b = GetMean(xArray, arraySizeX) - a * GetMean(yArray, arraySizeY);
     //Linear Regression
     cout << "y = " << a << "x + " << b<<endl;
     //conclusion
     cout << "--" << endl;
+    }
     //delete array
+    cout<<"remove data from heap"<<endl;
     arrayContent->~double2();
     //Credit
+    cout<<"CREDIT:"<<endl;
     cout<<"ASSIGNMENT 1 Group 20"<<endl;
     cout<<"s3836412"<<"s3836412@rmit.edu.vn"<<"Nguyen Ngoc Minh Quang"<<endl;
     cout<<"s3801492"<<"s3801492@rmit.edu.vn"<<"Nghiem The Minh"<<endl;

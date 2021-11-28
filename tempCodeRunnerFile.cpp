@@ -1,1 +1,0 @@
-cout << str << " is an number" << endl;
