@@ -3,27 +3,68 @@
 #include <string>
 #include <math.h>
 #include<iomanip>
-//include class we create
-#include "List.cpp"
-//#include"Descriptive_Static.cpp"
 using namespace std;
+class double2{
+    double *xArr;
+    double *yArr;
+    int size;
+    //constructor
+    public:
+        double2(double *xArr,double *yArr,int size)
+        {
+            this->xArr=xArr;
+            this->yArr=yArr;
+            this->size=size;
+        }
+        ~double2()
+        {
+            cout<<"double has been deleted"<<endl;
+            delete[] xArr;
+            delete[] yArr;
+        }
+        double* GetXArray()
+        {
+            cout<<"x: ";
+            for(int i=0;i<size;i++)
+            {
+                cout<<","<<xArr[i];
+            }
+            return xArr;
+        }
+        double* GetYArray()
+        {
+            cout<<"y: ";
+            for(int i=0;i<size;i++)
+            {
+                cout<<","<<yArr[i];
+            }
+            return yArr;
+        }
+        int Size()
+        {
+            return size;
+        }
+};
 //static value use in testing
 //change to exact location if the name below does match
 //string fileName ="data1.csv";
 //read csv from given location
-int2 ReadCSVFile(string fileLocation)
+double2* ReadCSVFile(string fileLocation)
 {
     const int delimiterLength = 1;
     //open file
     ifstream infile(fileLocation, ios::in | ios::binary);
+    ifstream infile2(fileLocation,ios::in|ios::binary);
     //check if file open successfully
-    if (!infile)
+    if (!infile||!infile2)
     {
         cerr << "File failed to open!" << endl;
+        cerr<<"file Location need to be update to match on your system"<<endl;
         //return NULL;
     }
-    //Initualize List
-    int2 valueList;
+    //Initualize array
+    double* xArray;
+    double* yArray;
     //read file
     string line = "";
     //int
@@ -32,9 +73,22 @@ int2 ReadCSVFile(string fileLocation)
     int count = 0;
     //ignore the value first line
     getline(infile, line);
+    getline(infile2, line);
     //
     cout << "Reading CSV FILE" << endl;
+    //get amount of line
     while (getline(infile, line))
+    {
+        count++;
+    }
+    cout<<"counting complete: "<<count<<endl;
+    //Init array
+    xArray=new double[count];
+    yArray=new double[count];
+    int runningValue=0;
+    cout<<"Initualize array complete"<<endl;
+    //get data
+    while (getline(infile2, line))
     {
         //split line by comma
         int cPos = line.find(",");           //position of comma
@@ -43,30 +97,64 @@ int2 ReadCSVFile(string fileLocation)
         //convert to int
         x = stoi(first);
         y = stoi(second);
-        valueList.Add(x, y);
-        //UI display
-        count++;
-        if (count % 500 == 0)
-        {
-            cout << "=";
-        }
+        xArray[runningValue]=x;
+        yArray[runningValue]=y;
+        runningValue++;
+        //cout<<"value add in: "<<x<<" and "<<y<<endl;
     }
     cout << endl
          << "Reading Complete" << endl;
+    double2* temp=new double2(xArray,yArray,count);
     //close file
     infile.close();
-    return valueList;
+    infile2.close();
+    return temp;
 }
 //Common Function--------------------------------------------------------------
-int2 GetATestingList()
+//check if a string is a number
+void check_number(string str) 
 {
-    int2 valueList;
-    valueList.Add(1, 2);
-    valueList.Add(3, 4);
-    valueList.Add(8, 6);
-    valueList.Add(4, 8);
+    int dot = 1;
+    int polarity = 1;
 
-    return valueList;
+
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (isdigit(str[i]) == false)
+        {
+            if (str[i] == ' ')
+            {
+                continue;
+            }
+            else if (str[i] == '.' && dot == 1)
+            {
+                dot--;
+                polarity--;
+                continue;
+            }
+            else if (str[i] == '+' && polarity == 1 || str[i] == '-' && polarity == 1)
+            {
+                polarity--;
+                continue;
+            }
+            else
+            {            
+                cout << str << " is a string" << endl;
+                break;
+            }
+        }
+        else
+        {
+            if (i == (str.length() -1))
+            {
+                cout << str << " is an number" << endl;
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
 }
 //display
 void Display(double *arr, int size)
@@ -199,7 +287,7 @@ double Median(double *array, int size)
     }
 }
 //2 Mode
-int Mode(double *arr, int size)
+double Mode(double *arr, int size)
 {
     //top
     int maxModeValue = arr[0];
@@ -393,39 +481,39 @@ float slope(double r, double sX, double sY) {
 
 int main(int argc, char* argv[])
 {
-    //string fileName = "data1.csv";
     if (argc!=2) {
     cerr << "Wrong number of inputs" << endl;
     return 0;
     }
-    cout<<string(argv[1]);
+    //cout<<string(argv[1]);
     //Get values from reader
-    int2 valueList = ReadCSVFile(string(argv[1]));
+    //string fileName = "data1.csv";
+    //Get values from reader
+    double2 *arrayContent = ReadCSVFile(string(argv[1]));
     //while Testing use GetATestingList to check for the result
-    //int2 valueList=GetATestingList();
+    // double xArr[]={1,2,3,62,31,51,23};
+    // double yArr[]={83,23,12,43,82,12,2};
+    // int size=7;
+    // double2* temp=new double2(xArr,yArr,size);
+    // double2* arrayContent=temp;
     //convert list to 2 array
-    double* xArray=new double[valueList.Size()];
-    double* yArray=new double[valueList.Size()];
-    cout<<setprecision(4)<<endl;
-    cout<<fixed;
+    int arraySize = arrayContent->Size();
+    double* xArray=arrayContent->GetXArray();
+    double* yArray=arrayContent->GetYArray();
     //initing
     cout<<"Initualize dynamic array"<<endl;
-    int arraySize = valueList.Size();
-    cout<<"array size:"<<arraySize;
-    //Display(xArray,arraySize);
-    //Display(yArray,arraySize);
-    for (int i = 0; i < valueList.Size(); i++)
-    {
-        xArray[i] = valueList.GetNodeAt(i)->GetX();
-        yArray[i] = valueList.GetNodeAt(i)->GetY();
-    }
+    cout<<"array size:"<<arraySize<<endl;
+    // Display(xArray,arraySize);
+    // Display(yArray,arraySize);
     //sorting
     cout << "Sorting Start! Please Wait" << endl;
     quickSort(xArray, 0, arraySize - 1,arraySize);
     quickSort(yArray, 0, arraySize - 1,arraySize);
     cout << "Sorting Completed successfully" << endl;
-    Display(xArray,arraySize);
-    Display(yArray,arraySize);
+    cout<<setprecision(4)<<endl;
+    cout<<fixed;
+    // Display(xArray,arraySize);
+    // Display(yArray,arraySize);
     //Display(valueList);
     cout << "--------------------------------------------" << endl;
     cout << "Start display the result:" << endl;
@@ -510,7 +598,12 @@ int main(int argc, char* argv[])
     //conclusion
     cout << "--" << endl;
     //delete array
-    delete[] xArray;
-    delete[] yArray;
+    arrayContent->~double2();
+    //Credit
+    cout<<"ASSIGNMENT 1 Group 20"<<endl;
+    cout<<"s3836412"<<"s3836412@rmit.edu.vn"<<"Nguyen Ngoc Minh Quang"<<endl;
+    cout<<"s3801492"<<"s3801492@rmit.edu.vn"<<"Nghiem The Minh"<<endl;
+    cout<<"s3863956"<<"s3863956@rmit.edu.vn"<<"Tran Nguyen Anh Khoa"<<endl;
+    cout<<"s3777235"<<"s3777235@rmit.edu.vn"<<"Hua Ha Bao Long"<<endl;
     return 0;
 }

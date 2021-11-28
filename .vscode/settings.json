@@ -15,6 +15,9 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "new": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "iomanip": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp"
     }
 }
