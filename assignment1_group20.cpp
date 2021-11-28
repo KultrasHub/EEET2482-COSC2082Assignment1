@@ -139,11 +139,11 @@ double2* ReadCSVFile(string fileLocation)
             //cout<<"first checked"<<first<<endl;
             countX++;
         }
-        cout<<"on second check: "<<second<<endl;
+        //cout<<"on second check: "<<second<<endl;
         //cout<<IsNumber(second)<<endl;
         if(IsNumber(second))
         {
-            cout<<"is a number"<<endl;
+            //cout<<"is a number"<<endl;
             countY++;
         }
     }
