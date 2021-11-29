@@ -108,7 +108,7 @@ double2* ReadCSVFile(string fileLocation)
     {
         cerr << "File failed to open!" << endl;
         cerr<<"file Location need to be update to match on your system"<<endl;
-        //return NULL;
+        return NULL;
     }
     //Initualize array
     double* xArray;
@@ -519,6 +519,11 @@ int main(int argc, char* argv[])
     //string fileName = "data1.csv";
     //Get values from reader
     double2 *arrayContent = ReadCSVFile(string(argv[1]));
+    if(arrayContent==NULL)
+    {
+        cerr<<"we can not locate your file. Please try again with correct file location";
+        return 0;
+    }
     //double2 *arrayContent = ReadCSVFile("data1.csv");
     //while Testing use GetATestingList to check for the result
     // double xArr[]={1,2,3,62,31,51,23};
