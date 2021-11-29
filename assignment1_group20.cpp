@@ -107,7 +107,6 @@ double2* ReadCSVFile(string fileLocation)
     if (!infile||!infile2)
     {
         cerr << "File failed to open!" << endl;
-        cerr<<"file Location need to be update to match on your system"<<endl;
         return NULL;
     }
     //Initualize array
